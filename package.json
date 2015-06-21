@@ -1,0 +1,29 @@
+{
+  "name": "fjcu_education",
+  "version": "0.0.1",
+  "description": "Node.js and RethinkDB",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimonSun1988/FJCU_NodeJS_RethinkDB.git"
+  },
+  "keywords": [
+    "Node.js",
+    "RethinkDB",
+    "FJCU"
+  ],
+  "author": "Simon Sun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SimonSun1988/FJCU_NodeJS_RethinkDB/issues"
+  },
+  "homepage": "https://github.com/SimonSun1988/FJCU_NodeJS_RethinkDB#readme",
+  "dependencies": {
+    "body-parser": "^1.13.1",
+    "express": "^4.12.4",
+    "rethinkdb": "^2.0.0-2"
+  }
+}
