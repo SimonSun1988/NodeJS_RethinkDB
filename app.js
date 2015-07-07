@@ -6,7 +6,12 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
+// 設定 view engine 與檔案的路徑
+app.set('view engine', 'jade');
+app.set('views', './views');
 
+
+// 創造一個 event
 var EventEmitter = require('events').EventEmitter;
 var bomb = new EventEmitter();
 
@@ -16,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-// Just connect to RethinkDB
+// 連線到 rethinkDB 並且監聽 people 這個 table
 var conn;
 r.connect({
     host: 'localhost',
@@ -24,11 +29,11 @@ r.connect({
     db: 'FJCU'
 }, function (err, conneciton){
     conn = conneciton;
-    r.table('posts').changes().run(conn, function (err, cursor) {
+    r.table('people').changes().run(conn, function (err, cursor) {
         cursor.each(function (err, row) {
             if (err) throw err;
-            // console.log(row);
-            bomb.emit('explode', { data: row } );
+
+            bomb.emit('insertData', { data: row } );
         });
     });
 });
@@ -37,9 +42,10 @@ r.connect({
 app.post('/', function ( req, res, next ) {
     var name = req.body.name;
     var age = req.body.age;
-    r.table('posts').insert({
+    r.table('people').insert({
         name: name,
-        age: age
+        age: age,
+        date: new Date()
     }, { returnChanges: true }).run(conn, function (err, doc) {
         console.log(err);
         return res.json(doc);
@@ -47,9 +53,9 @@ app.post('/', function ( req, res, next ) {
 });
 
 app.get('/', function ( req, res, next ) {
-    r.table('posts').run(conn, function (err, cursor){
+    r.table('people').orderBy('date').run(conn, function (err, cursor){
         cursor.toArray(function (err, docs){
-            return res.send(docs);
+            return res.render('index', { people: docs });
         });
     });
 });
@@ -58,13 +64,11 @@ app.get('/', function ( req, res, next ) {
 
 server.listen(9291);
 
-bomb.on('explode', function(data) {
-    console.log('data', data.data);
-});
-
-
 io.on('connection', function (socket) {
-    socket.on('insertData', function (data) {
-        console.log('data', data);
+
+    bomb.on('insertData', function(data) {
+        console.log('data', data.data);
+        var newData = data.data.new_val;
+        socket.emit('newData', newData);
     });
 });
