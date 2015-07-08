@@ -11,9 +11,9 @@ app.set('view engine', 'jade');
 app.set('views', './views');
 
 
-// 創造一個 event
+// 創造一個叫做 Service 的 event
 var EventEmitter = require('events').EventEmitter;
-var bomb = new EventEmitter();
+var Service = new EventEmitter();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -28,45 +28,76 @@ r.connect({
     port: 28015,
     db: 'FJCU'
 }, function (err, conneciton){
+
+    if(err){
+        console.log(err);
+        process.exit();
+    }
+
     conn = conneciton;
     r.table('people').changes().run(conn, function (err, cursor) {
         cursor.each(function (err, row) {
-            if (err) throw err;
 
-            bomb.emit('insertData', { data: row } );
+            if(err){
+                console.log(err);
+                process.exit();
+            }
+
+            Service.emit('insertData', { data: row } );
         });
     });
 });
 
 
 app.post('/', function ( req, res, next ) {
-    var name = req.body.name;
-    var age = req.body.age;
+
+    // 處理 post 過來的資料
+    var name = req.body.name || 'NO_NAME';
+    var age = req.body.age || 'NO_AGE';
+
+    // 將資料存入 db 內
     r.table('people').insert({
         name: name,
         age: age,
         date: new Date()
     }, { returnChanges: true }).run(conn, function (err, doc) {
-        console.log(err);
-        return res.json(doc);
+
+        if(err){
+            console.log(err);
+            process.exit();
+        }
+
+        return res.status(204).send();
     });
 });
 
 app.get('/', function ( req, res, next ) {
     r.table('people').orderBy('date').run(conn, function (err, cursor){
+
+        if(err){
+            console.log(err);
+            process.exit();
+        }
+
         cursor.toArray(function (err, docs){
+
+            if(err){
+                console.log(err);
+                process.exit();
+            }
+
             return res.render('index', { people: docs });
         });
     });
 });
 
 
-
+console.log('Listen port 9291');
 server.listen(9291);
 
 io.on('connection', function (socket) {
 
-    bomb.on('insertData', function(data) {
+    Service.on('insertData', function(data) {
         console.log('data', data.data);
         var newData = data.data.new_val;
         socket.emit('newData', newData);

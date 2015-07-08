@@ -8,35 +8,45 @@ html(lang="en")
         link(rel="stylesheet", type="text/css", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css")
 
     body
-        h1 Hello, Simon
-
-        label 姓名
-        input.form-control.name(placeholder='Simon')
-        label 年齡
-        input.form-control.age(placeholder='26')
-        button.send.btn.btn-default 送出
-
-        table.table.table-striped
-            thead
-                tr
-                    th 姓名
-                    th 年齡
-            tbody.messages
-                each item in people
-                    tr      
-                        td #{item.name}
-                        td #{item.age}
+        .container-fluid
+            .row
+                .col-xs-12
+                    .col-xs-2
+                    .col-xs-8
+                        h3 請輸入資料
+                        hr
+                        form(action='/', method='POST')
+                            .form-group
+                                label 姓名
+                                input.form-control.name(name='name')
+                            .form-group
+                                label 年齡
+                                input.form-control.age(name='age')
+                            button.btn.btn-primary.btn-lg.btn-block(type='submit') 送出
+                    .col-xs-2
+                .col-xs-12
+                    .col-xs-2
+                    .col-xs-8
+                        h3 顯示資料
+                        hr
+                        table.table.table-striped
+                            thead
+                                tr
+                                    th 姓名
+                                    th 年齡
+                            tbody.messages
+                                each item in people
+                                    tr      
+                                        td #{item.name}
+                                        td #{item.age}
+                    .col-xs-2
 
         script(type='text/javascript').
             var socket = io('http://127.0.0.1:9291/');
             socket.on('newData', function (data) {
                 console.log(data);
                 $('.messages').append('<tr><td>' + data.name + '</td><td>' + data.age + '</td></tr>');
-            });
-
-            $('.send').click(function(e) {
-                var name = $('.name').val();
-                var age = $('.age').val();
-                $.post( "/", { name: name, age: age });
+                $('.name').val('');
+                $('.age').val('');
             });
 
