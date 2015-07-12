@@ -1,6 +1,6 @@
 
 var r = require('rethinkdb');
-var service = require('../Service');
+var service = require('../service');
 
 r.connect({
     host: 'localhost',
