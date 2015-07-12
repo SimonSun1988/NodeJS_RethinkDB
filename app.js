@@ -26,9 +26,9 @@ app.use(bodyParser.json());
 
 /*
  * 載入 service 這個 Event 
- * 在 ./Service/index.js 這個檔案
+ * 在 ./service/index.js 這個檔案
  */
-var service = require('./Service');
+var service = require('./service');
 
 
 /*
@@ -63,3 +63,4 @@ io.on('connection', function (socket) {
         socket.emit('newData', newData);
     });
 });
+

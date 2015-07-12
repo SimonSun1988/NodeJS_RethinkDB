@@ -45,7 +45,7 @@ html(lang="en")
             var socket = io('http://127.0.0.1:9291/');
             socket.on('newData', function (data) {
                 console.log(data);
-                $('.messages').append('<tr><td>' + data.name + '</td><td>' + data.age + '</td></tr>');
+                $('.messages').prepend('<tr><td>' + data.name + '</td><td>' + data.age + '</td></tr>');
                 $('.name').val('');
                 $('.age').val('');
             });
