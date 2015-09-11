@@ -5,7 +5,7 @@ var service = require('../service');
 r.connect({
     host: 'localhost',
     port: 28015,
-    db: 'FJCU'
+    db: 'hackathon'
 }, function (err, conneciton){
 
     if(err){
